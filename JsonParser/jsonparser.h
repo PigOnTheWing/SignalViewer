@@ -8,6 +8,7 @@ namespace JsonParser {
         READY,
         START,
         STOP,
+        NEXT_VAL,
         AMPLITUDE,
         PERIOD,
         DISCONNECT
@@ -15,7 +16,7 @@ namespace JsonParser {
 
     struct JSONPARSER_EXPORT Message {
         Command command;
-        quint16 param;
+        qreal param;
     };
 
     JSONPARSER_EXPORT QByteArray toJson(const Message m);

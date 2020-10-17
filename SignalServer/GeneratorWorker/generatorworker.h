@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QTcpSocket>
 #include <QDataStream>
+#include "generator.h"
 
 class GeneratorWorker : public QObject
 {
@@ -25,6 +26,7 @@ private:
     bool isGenerating = false;
     QTcpSocket *socket = nullptr;
     QDataStream in;
+    Generator generator;
 
     void handleCommand();
 

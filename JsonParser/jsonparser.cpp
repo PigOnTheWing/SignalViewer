@@ -8,6 +8,7 @@ QByteArray JsonParser::toJson(const JsonParser::Message m)
     msgObj["Command"] = m.command;
 
     switch (m.command) {
+    case JsonParser::NEXT_VAL:
     case JsonParser::AMPLITUDE:
     case JsonParser::PERIOD: {
         msgObj["Attr"] = m.param;
@@ -28,9 +29,10 @@ JsonParser::Message JsonParser::fromJson(const QByteArray json)
     m.command = static_cast<JsonParser::Command>(msgObj.value("Command").toInt());
 
     switch (m.command) {
+    case JsonParser::NEXT_VAL:
     case JsonParser::AMPLITUDE:
     case JsonParser::PERIOD: {
-        m.param = msgObj.value("Command").toInt();
+        m.param = msgObj.value("Command").toDouble();
         break;
     }
     default: {}

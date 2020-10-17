@@ -14,7 +14,12 @@ GeneratorWorker::GeneratorWorker(QTcpSocket *s, QObject *parent) : QObject(paren
 void GeneratorWorker::generateNext()
 {
     if (isGenerating) {
-        // do generation
+        qreal nextVal = generator.next();
+
+        JsonParser::Message m = {.command = JsonParser::NEXT_VAL, .param = nextVal};
+        QByteArray json = JsonParser::toJson(m);
+
+        socket->write(json);
 
         emit generateNew();
     }
@@ -38,18 +43,28 @@ void GeneratorWorker::handleCommand()
         emit generateNew();
         break;
     }
+
     case JsonParser::STOP: {
         isGenerating = false;
         break;
     }
-    case JsonParser::AMPLITUDE: break; //Change amplitude
-    case JsonParser::PERIOD: break; // Change period
+
+    case JsonParser::AMPLITUDE: {
+        generator.setAmplitude(m.param);
+        break;
+    }
+
+    case JsonParser::PERIOD: {
+        generator.setPeriod(m.param);
+        break;
+    }
+
     case JsonParser::DISCONNECT: {
         isGenerating = false;
         emit userDisconnected();
         break;
     }
-    default: {}
+    default: { break; }
     }
 }
 

@@ -10,9 +10,11 @@ CONFIG -= app_bundle
 
 INCLUDEPATH += \
         SignalServer/ \
-        GeneratorWorker/
+        GeneratorWorker/ \
+        Generator/
 
 SOURCES += \
+        Generator/generator.cpp \
         GeneratorWorker/generatorworker.cpp \
         SignalServer/signal_server.cpp \
         main.cpp
@@ -23,6 +25,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
+    Generator/generator.h \
     GeneratorWorker/generatorworker.h \
     SignalServer/signal_server.h
 
