@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QTcpSocket>
+#include <QDataStream>
 
 class GeneratorWorker : public QObject
 {
@@ -23,6 +24,7 @@ private slots:
 private:
     bool isGenerating = false;
     QTcpSocket *socket = nullptr;
+    QDataStream in;
 
     void handleCommand();
 

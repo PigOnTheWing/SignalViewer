@@ -1,7 +1,10 @@
+#include <jsonparser.h>
 #include "generatorworker.h"
 
 GeneratorWorker::GeneratorWorker(QTcpSocket *s, QObject *parent) : QObject(parent), socket(s)
 {
+    in.setDevice(socket);
+
     connect(socket, &QAbstractSocket::disconnected, socket, &QTcpSocket::deleteLater);
 
     connect(this, &GeneratorWorker::generateNew, this, &GeneratorWorker::generateNext);
@@ -19,11 +22,41 @@ void GeneratorWorker::generateNext()
 
 void GeneratorWorker::handleCommand()
 {
-    // switch for different commands
-    emit userDisconnected();
+    in.startTransaction();
+
+    QByteArray json;
+    in >> json;
+
+    if (!in.commitTransaction()) {
+        return;
+    }
+
+    JsonParser::Message m = JsonParser::fromJson(json);
+    switch (m.command) {
+    case JsonParser::START: {
+        isGenerating = true;
+        emit generateNew();
+        break;
+    }
+    case JsonParser::STOP: {
+        isGenerating = false;
+        break;
+    }
+    case JsonParser::AMPLITUDE: break; //Change amplitude
+    case JsonParser::PERIOD: break; // Change period
+    case JsonParser::DISCONNECT: {
+        isGenerating = false;
+        emit userDisconnected();
+        break;
+    }
+    default: {}
+    }
 }
 
 void GeneratorWorker::notifyClient()
 {
-    return;
+    JsonParser::Message m = {.command = JsonParser::READY, .param = 0};
+    QByteArray json = JsonParser::toJson(m);
+
+    socket->write(json);
 }

@@ -1,0 +1,12 @@
+#ifndef JSONPARSER_GLOBAL_H
+#define JSONPARSER_GLOBAL_H
+
+#include <QtCore/qglobal.h>
+
+#if defined(JSONPARSER_LIBRARY)
+#  define JSONPARSER_EXPORT Q_DECL_EXPORT
+#else
+#  define JSONPARSER_EXPORT Q_DECL_IMPORT
+#endif
+
+#endif // JSONPARSER_GLOBAL_H
