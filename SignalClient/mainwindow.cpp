@@ -18,8 +18,7 @@ MainWindow::MainWindow(QWidget *parent)
     chart->setTitle("Signal");
     chart->createDefaultAxes();
 
-    QChartView *view = new QChartView(this);
-    view->setChart(chart);
+    ChartView *view = new ChartView(chart, this);
     view->setRenderHint(QPainter::Antialiasing);
 
     ui->chart->insertWidget(0, view);
@@ -27,6 +26,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->disconnectButton->setEnabled(false);
     ui->startButton->setEnabled(false);
     ui->stopButton->setEnabled(false);
+
+    connect(ui->actionColour, &QAction::triggered, this, &MainWindow::startColourDialog);
+    connect(ui->actionWidth, &QAction::triggered, this, &MainWindow::startWidthDialog);
 }
 
 MainWindow::~MainWindow()
@@ -37,6 +39,10 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_periodSlider_sliderMoved(int position)
 {
+    if (!socket) {
+        return;
+    }
+
     qreal newPeriod = position / PRECISION;
 
     JsonParser::Message m = {.command = JsonParser::PERIOD, .param = newPeriod};
@@ -47,6 +53,10 @@ void MainWindow::on_periodSlider_sliderMoved(int position)
 
 void MainWindow::on_amplitudeSlider_sliderMoved(int position)
 {
+    if (!socket) {
+        return;
+    }
+
     qreal newAmplitude = position / PRECISION;
 
     JsonParser::Message m = {.command = JsonParser::AMPLITUDE, .param = newAmplitude};
@@ -76,6 +86,7 @@ void MainWindow::on_disconnectButton_clicked()
 
     socket->abort();
     delete socket;
+    socket = nullptr;
 
     ui->disconnectButton->setEnabled(false);
     ui->startButton->setEnabled(false);
@@ -124,4 +135,39 @@ void MainWindow::commandFromServer()
     }
     default: {}
     }
+}
+
+void MainWindow::setColour(const QColor &color)
+{
+    splineSeries->setColor(color);
+}
+
+void MainWindow::startColourDialog()
+{
+    QColorDialog *colourDialog = new QColorDialog(this);
+    colourDialog->setAttribute(Qt::WA_DeleteOnClose);
+    colourDialog->setModal(false);
+
+    connect(colourDialog, &QColorDialog::currentColorChanged, this, &MainWindow::setColour);
+    connect(colourDialog, &QColorDialog::colorSelected, this, &MainWindow::setColour);
+
+    colourDialog->show();
+}
+
+void MainWindow::setWidth(int newWidth)
+{
+    QPen pen = splineSeries->pen();
+    pen.setWidth(newWidth);
+    splineSeries->setPen(pen);
+}
+
+void MainWindow::startWidthDialog()
+{
+    WidthDialog *widthDialog = new WidthDialog(this);
+    widthDialog->setAttribute(Qt::WA_DeleteOnClose);
+    widthDialog->setModal(false);
+
+    connect(widthDialog, &WidthDialog::valChanged, this, &MainWindow::setWidth);
+
+    widthDialog->show();
 }

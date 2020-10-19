@@ -3,8 +3,11 @@
 
 #include <QMainWindow>
 #include <QtCharts>
+#include <QColorDialog>
 #include <jsonparser.h>
 #include "connectiondialog.h"
+#include "chartview.h"
+#include "widthdialog.h"
 
 #define PRECISION 200.0
 
@@ -32,11 +35,18 @@ private slots:
 
     void commandFromServer();
 
+    void setColour(const QColor &color);
+    void startColourDialog();
+
+    void setWidth(int newWidth);
+    void startWidthDialog();
+
 private:
     Ui::MainWindow *ui;
 
     QSplineSeries *splineSeries = nullptr;
     QChart *chart = nullptr;
+
     QTcpSocket *socket = nullptr;
 };
 #endif // MAINWINDOW_H

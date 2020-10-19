@@ -23,7 +23,7 @@ void GeneratorWorker::generateNext()
 
         socket->write(json);
 
-        QTimer::singleShot(500, this, &GeneratorWorker::generateNext);
+        QTimer::singleShot(100, this, &GeneratorWorker::generateNext);
     }
 }
 

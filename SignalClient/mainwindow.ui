@@ -43,6 +43,12 @@
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
+         <property name="tickPosition">
+          <enum>QSlider::NoTicks</enum>
+         </property>
+         <property name="tickInterval">
+          <number>0</number>
+         </property>
         </widget>
        </item>
        <item>
@@ -81,6 +87,12 @@
          </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="tickPosition">
+          <enum>QSlider::NoTicks</enum>
+         </property>
+         <property name="tickInterval">
+          <number>0</number>
          </property>
         </widget>
        </item>
@@ -138,8 +150,26 @@
      <height>23</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuColour">
+    <property name="title">
+     <string>Appearance</string>
+    </property>
+    <addaction name="actionWidth"/>
+    <addaction name="actionColour"/>
+   </widget>
+   <addaction name="menuColour"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionWidth">
+   <property name="text">
+    <string>Width</string>
+   </property>
+  </action>
+  <action name="actionColour">
+   <property name="text">
+    <string>Colour</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

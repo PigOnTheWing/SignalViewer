@@ -8,19 +8,27 @@ CONFIG += c++11
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-INCLUDEPATH += Connect/
+INCLUDEPATH += \
+    Connect/ \
+    ChartView/ \
+    Width/
 
 SOURCES += \
+    ChartView/chartview.cpp \
     Connect/connectiondialog.cpp \
+    Width/widthdialog.cpp \
     main.cpp \
     mainwindow.cpp
 
 HEADERS += \
+    ChartView/chartview.h \
     Connect/connectiondialog.h \
+    Width/widthdialog.h \
     mainwindow.h
 
 FORMS += \
     Connect/connectiondialog.ui \
+    Width/widthdialog.ui \
     mainwindow.ui
 
 # Default rules for deployment.
