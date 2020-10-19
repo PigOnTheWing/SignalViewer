@@ -10,7 +10,7 @@ class GeneratorWorker : public QObject
 {
     Q_OBJECT
 public:
-    explicit GeneratorWorker(QTcpSocket *socket, QObject *parent = nullptr);
+    explicit GeneratorWorker(qintptr descriptor, QObject *parent = nullptr);
 
 signals:
     void generateNew();
@@ -25,7 +25,6 @@ private slots:
 private:
     bool isGenerating = false;
     QTcpSocket *socket = nullptr;
-    QDataStream in;
     Generator generator;
 
     void handleCommand();

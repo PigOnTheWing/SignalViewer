@@ -4,11 +4,10 @@ SignalServer::SignalServer(QObject *parent) : QObject(parent)
 {
 }
 
-void SignalServer::initConnection()
+void SignalServer::initConnection(qintptr descriptor)
 {
     QThread *sessionThread = new QThread;
-    QTcpSocket *s = server->nextPendingConnection();
-    GeneratorWorker *worker = new GeneratorWorker(s);
+    GeneratorWorker *worker = new GeneratorWorker(descriptor);
 
     worker->moveToThread(sessionThread);
     connect(sessionThread, &QThread::finished, worker, &GeneratorWorker::deleteLater);
@@ -22,7 +21,7 @@ void SignalServer::initConnection()
 
 void SignalServer::startListening()
 {
-    server = new QTcpServer(this);
+    server = new ThreadedTcpServer(this);
 
     if (!server->listen()) {
         qFatal("Failed to start server");
@@ -47,5 +46,5 @@ void SignalServer::startListening()
 
     qInfo("Server listening on %s:%d", qUtf8Printable(ipAddress), server->serverPort());
 
-    connect(server, &QTcpServer::newConnection, this, &SignalServer::initConnection);
+    connect(server, &ThreadedTcpServer::descriptorReady, this, &SignalServer::initConnection);
 }

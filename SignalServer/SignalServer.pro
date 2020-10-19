@@ -11,12 +11,14 @@ CONFIG -= app_bundle
 INCLUDEPATH += \
         SignalServer/ \
         GeneratorWorker/ \
-        Generator/
+        Generator/ \
+        TcpServer
 
 SOURCES += \
         Generator/generator.cpp \
         GeneratorWorker/generatorworker.cpp \
         SignalServer/signal_server.cpp \
+        TcpServer/threadedtcpserver.cpp \
         main.cpp
 
 # Default rules for deployment.
@@ -27,7 +29,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     Generator/generator.h \
     GeneratorWorker/generatorworker.h \
-    SignalServer/signal_server.h
+    SignalServer/signal_server.h \
+    TcpServer/threadedtcpserver.h
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../JsonParser/release/ -lJsonParser
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../JsonParser/debug/ -lJsonParser

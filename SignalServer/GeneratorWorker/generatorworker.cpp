@@ -1,13 +1,15 @@
 #include <jsonparser.h>
+#include <QTimer>
 #include "generatorworker.h"
 
-GeneratorWorker::GeneratorWorker(QTcpSocket *s, QObject *parent) : QObject(parent), socket(s)
+GeneratorWorker::GeneratorWorker(qintptr descriptor, QObject *parent) : QObject(parent)
 {
-    in.setDevice(socket);
+    socket = new QTcpSocket(this);
+    if (!socket->setSocketDescriptor(descriptor)) {
+        qDebug("Failed to create a socket");
+    }
 
-    connect(socket, &QAbstractSocket::disconnected, socket, &QTcpSocket::deleteLater);
-
-    connect(this, &GeneratorWorker::generateNew, this, &GeneratorWorker::generateNext);
+    connect(this, &GeneratorWorker::generateNew, this, &GeneratorWorker::generateNext, Qt::QueuedConnection);
     connect(socket, &QIODevice::readyRead, this, &GeneratorWorker::handleCommand);
 }
 
@@ -21,26 +23,19 @@ void GeneratorWorker::generateNext()
 
         socket->write(json);
 
-        emit generateNew();
+        QTimer::singleShot(500, this, &GeneratorWorker::generateNext);
     }
 }
 
 void GeneratorWorker::handleCommand()
 {
-    in.startTransaction();
-
-    QByteArray json;
-    in >> json;
-
-    if (!in.commitTransaction()) {
-        return;
-    }
+    QByteArray json = socket->readAll();
 
     JsonParser::Message m = JsonParser::fromJson(json);
     switch (m.command) {
     case JsonParser::START: {
         isGenerating = true;
-        emit generateNew();
+        QTimer::singleShot(1000, this, &GeneratorWorker::generateNext);
         break;
     }
 

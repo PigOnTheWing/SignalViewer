@@ -32,7 +32,7 @@ JsonParser::Message JsonParser::fromJson(const QByteArray json)
     case JsonParser::NEXT_VAL:
     case JsonParser::AMPLITUDE:
     case JsonParser::PERIOD: {
-        m.param = msgObj.value("Command").toDouble();
+        m.param = msgObj.value("Attr").toDouble();
         break;
     }
     default: {}

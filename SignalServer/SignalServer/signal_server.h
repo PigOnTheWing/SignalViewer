@@ -2,11 +2,11 @@
 #define SIGNAL_SERVER_H
 
 #include <QObject>
-#include <QTcpServer>
 #include <QThread>
 #include <QNetworkInterface>
 #include <QTimer>
 #include "generatorworker.h"
+#include "threadedtcpserver.h"
 
 class SignalServer : public QObject
 {
@@ -21,10 +21,10 @@ public slots:
     void startListening();
 
 private slots:
-    void initConnection();
+    void initConnection(qintptr decriptor);
 
 private:
-    QTcpServer *server = nullptr;
+     ThreadedTcpServer *server = nullptr;
 };
 
 #endif // SIGNAL_SERVER_H
