@@ -30,7 +30,8 @@ HEADERS += \
     Generator/generator.h \
     GeneratorWorker/generatorworker.h \
     SignalServer/signal_server.h \
-    TcpServer/threadedtcpserver.h
+    TcpServer/threadedtcpserver.h \
+    defaults.h
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../JsonParser/release/ -lJsonParser
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../JsonParser/debug/ -lJsonParser

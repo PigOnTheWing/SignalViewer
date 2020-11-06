@@ -1,11 +1,13 @@
 #include "signal_server.h"
 
-SignalServer::SignalServer(QObject *parent) : QObject(parent)
+SignalServer::SignalServer(quint16 _port, QObject *parent) : QObject(parent), port(_port)
 {
 }
 
 void SignalServer::initConnection(qintptr descriptor)
 {
+    qInfo("Handling incoming connection");
+
     QThread *sessionThread = new QThread;
     GeneratorWorker *worker = new GeneratorWorker(descriptor);
 
@@ -17,13 +19,14 @@ void SignalServer::initConnection(qintptr descriptor)
     QTimer::singleShot(0, worker, &GeneratorWorker::notifyClient);
 
     sessionThread->start();
+    qInfo("Client thread started");
 }
 
 void SignalServer::startListening()
 {
     server = new ThreadedTcpServer(this);
 
-    if (!server->listen()) {
+    if (!server->listen(QHostAddress::Any, port)) {
         qFatal("Failed to start server");
         emit exitPrematurely();
         return;
@@ -44,7 +47,7 @@ void SignalServer::startListening()
        ipAddress = QHostAddress(QHostAddress::LocalHost).toString();
     }
 
-    qInfo("Server listening on %s:%d", qUtf8Printable(ipAddress), server->serverPort());
+    qInfo("Server listening on %s:%d", qUtf8Printable(ipAddress), port);
 
     connect(server, &ThreadedTcpServer::descriptorReady, this, &SignalServer::initConnection);
 }

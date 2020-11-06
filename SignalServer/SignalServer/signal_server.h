@@ -12,7 +12,7 @@ class SignalServer : public QObject
 {
     Q_OBJECT
 public:
-    explicit SignalServer(QObject *parent = nullptr);
+    explicit SignalServer(quint16 _port = 0, QObject *parent = nullptr);
 
 signals:
     void exitPrematurely();
@@ -25,6 +25,7 @@ private slots:
 
 private:
      ThreadedTcpServer *server = nullptr;
+     quint16 port = 0;
 };
 
 #endif // SIGNAL_SERVER_H
