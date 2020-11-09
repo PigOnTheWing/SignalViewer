@@ -19,6 +19,7 @@ SOURCES += \
         GeneratorWorker/generatorworker.cpp \
         SignalServer/signal_server.cpp \
         TcpServer/threadedtcpserver.cpp \
+        logging.cpp \
         main.cpp
 
 # Default rules for deployment.
@@ -31,7 +32,8 @@ HEADERS += \
     GeneratorWorker/generatorworker.h \
     SignalServer/signal_server.h \
     TcpServer/threadedtcpserver.h \
-    defaults.h
+    defaults.h \
+    logging.h
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../JsonParser/release/ -lJsonParser
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../JsonParser/debug/ -lJsonParser
