@@ -5,23 +5,36 @@
 #include <QFlags>
 #include <QScopedPointer>
 #include <QLoggingCategory>
+#include <QDateTime>
 
-namespace Logging {
+class Logger {
+
+public:
+    Logger() {}
+    ~Logger() {}
+
     enum OutputOption {
-        StandardOutput = 0b00000001,
-        File = 0b00000010
+        StandardOutput = 0x1,
+        File = 0x2
     };
     Q_DECLARE_FLAGS(OutputOptions, OutputOption)
 
-    struct LoggingParams {
-        QScopedPointer<QFile> loggingFile;
-        OutputOptions outputOptions;
-        QtMsgType level;
-    };
+    void setLoggingFilters();
 
-    void setLoggingFilters(QtMsgType level);
-}
+    bool setLoggingFile(QString filename);
+    void setOutputOptions(OutputOptions options);
+    void setLevel(QtMsgType level);
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(Logging::OutputOptions);
+    void handleMessage(QtMsgType type, const QMessageLogContext &context, const QString &msg);
+
+private:
+    QScopedPointer<QFile> mLoggingFile;
+    OutputOptions mOutputOptions;
+    QtMsgType mLevel;
+
+    void printMessage(QtMsgType type, const QMessageLogContext &context, const QString &msg, QTextStream &out);
+};
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(Logger::OutputOptions);
 
 #endif // LOGGING_H

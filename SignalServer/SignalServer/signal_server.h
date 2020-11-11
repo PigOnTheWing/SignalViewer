@@ -12,20 +12,14 @@ class SignalServer : public QObject
 {
     Q_OBJECT
 public:
-    explicit SignalServer(quint16 _port = 0, QObject *parent = nullptr);
-
-signals:
-    void exitPrematurely();
-
-public slots:
-    void startListening();
+    explicit SignalServer(QObject *parent = nullptr);
+    bool startListening(quint16 port);
 
 private slots:
     void initConnection(qintptr decriptor);
 
 private:
-     ThreadedTcpServer *server = nullptr;
-     quint16 port = 0;
+     ThreadedTcpServer *mServer = nullptr;
 };
 
 #endif // SIGNAL_SERVER_H
