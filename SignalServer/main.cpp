@@ -6,59 +6,13 @@
 #include <QDateTime>
 #include <QFileInfo>
 #include "signal_server.h"
-#include "defaults.h"
-#include "logging.h"
+#include "qsettingswrapper.h"
 
 
-Logging::LoggingParams g_loggingParams;
-
-void printMsg(QtMsgType type, const QMessageLogContext &context, const QString &msg, QTextStream &out) {
-    out << QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss ");
-
-    switch (type) {
-    case QtDebugMsg: {
-        out << "DEBUG ";
-        break;
-    }
-    case QtInfoMsg: {
-        out << "INFO ";
-        break;
-    }
-    case QtWarningMsg: {
-        out << "WARN ";
-        break;
-    }
-    case QtCriticalMsg: {
-        out << "CRITICAL ";
-        break;
-    }
-    case QtFatalMsg: {
-        out << "FATAL ";
-        break;
-    }
-    }
-
-    out << msg;
-
-#ifdef QT_DEBUG
-    out << context.file << " :" << context.line << ": ";
-#endif
-
-    out << Qt::endl;
-    out.flush();
-}
-
+Logger gLogger;
 
 void messageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg) {
-    if (g_loggingParams.outputOptions.testFlag(Logging::File)) {
-        QTextStream out(g_loggingParams.loggingFile.data());
-        printMsg(type, context, msg, out);
-    }
-
-    if (g_loggingParams.outputOptions.testFlag(Logging::StandardOutput)) {
-        QTextStream out(stdout);
-        printMsg(type, context, msg, out);
-    }
+    gLogger.handleMessage(type, context, msg);
 }
 
 
@@ -79,63 +33,30 @@ int main(int argc, char *argv[])
     QString configFile = parser.value(configOption);
 
     if (configFile == "") {
-        qFatal("No config option given, exiting");
+        qCritical("No config option given, exiting");
+        exit(0);
     }
 
-    qint16 port;
-    QString loggingFile;
-    QtMsgType msgType;
-    Logging::OutputOptions outOptions;
+    QSettingsWrapper settings(configFile);
 
-    QSettings settings(configFile, QSettings::IniFormat);
-    if (settings.allKeys().count() == 0) {
-        if (QFileInfo::exists(configFile)) {
-            qFatal("Could not open config file %s or file is empty, exiting", qUtf8Printable(configFile));
-        }
+    qint16 port = settings.getPort();
 
-        port = defaultPort;
-        msgType = defaultMsgType;
-        outOptions = defaultOutOptions;
-        loggingFile = defaultLogFilename;
-
-        settings.setValue("General/port", port);
-        settings.setValue("Logging/level", QString::number(msgType));
-        settings.setValue("Logging/output", QString::number(outOptions));
-
-        if (outOptions.testFlag(Logging::File)) {
-            settings.setValue("Logging/filename", loggingFile);
-        }
-
-        qInfo("Creating default config file, port = %d, log mode = %s, logging level = %s, log file - %s",
-              port, qUtf8Printable(QString::number(outOptions)), qUtf8Printable(QString::number(msgType)), qUtf8Printable(loggingFile));
-    } else {
-        port = settings.value("General/port").toInt();
-        msgType = static_cast<QtMsgType>(settings.value("Logging/level").toInt());
-        outOptions = static_cast<Logging::OutputOptions>(settings.value("Logging/output").toInt());
-
-        if (outOptions.testFlag(Logging::File)) {
-            loggingFile = settings.value("Logging/filename").toString();
-        }
+    gLogger.setLevel(settings.getLoggingLevel());
+    gLogger.setOutputOptions(settings.getOutputOptions());
+    if (!gLogger.setLoggingFile(settings.getLoggingFile())) {
+        qCritical("Could not open logging file");
+        exit(0);
     }
 
-    Logging::setLoggingFilters(msgType);
-
-    g_loggingParams.level = msgType;
-    g_loggingParams.outputOptions = outOptions;
-    g_loggingParams.loggingFile.reset(new QFile(loggingFile));
-    if (g_loggingParams.outputOptions.testFlag(Logging::File)) {
-        if (!g_loggingParams.loggingFile.data()->open(QIODevice::WriteOnly | QIODevice::Append)) {
-            qFatal("Could not open file %s, exiting", qUtf8Printable(loggingFile));
-        }
-    }
+    gLogger.setLoggingFilters();
 
     qInstallMessageHandler(messageHandler);
 
-    SignalServer signalServer(port);
-
-    QObject::connect(&signalServer, &SignalServer::exitPrematurely, &a, &QCoreApplication::quit);
-
-    QTimer::singleShot(0, &signalServer, &SignalServer::startListening);
+    SignalServer signalServer;
+    if (!signalServer.startListening(port)) {
+        qCritical("Could not start the server");
+        exit(0);
+    }
 
     return a.exec();
 }

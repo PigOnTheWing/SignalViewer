@@ -12,11 +12,13 @@ INCLUDEPATH += \
         SignalServer/ \
         GeneratorWorker/ \
         Generator/ \
-        TcpServer
+        TcpServer/ \
+        QSettingsWrapper/
 
 SOURCES += \
         Generator/generator.cpp \
         GeneratorWorker/generatorworker.cpp \
+        QSettingsWrapper/qsettingswrapper.cpp \
         SignalServer/signal_server.cpp \
         TcpServer/threadedtcpserver.cpp \
         logging.cpp \
@@ -30,6 +32,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     Generator/generator.h \
     GeneratorWorker/generatorworker.h \
+    QSettingsWrapper/qsettingswrapper.h \
     SignalServer/signal_server.h \
     TcpServer/threadedtcpserver.h \
     defaults.h \
