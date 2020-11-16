@@ -17,9 +17,10 @@ public:
 
 private slots:
     void initConnection(qintptr decriptor);
+    void exitServer();
 
 private:
-     ThreadedTcpServer *mServer = nullptr;
+     ThreadedTcpServer *m_server = nullptr;
 };
 
 #endif // SIGNAL_SERVER_H

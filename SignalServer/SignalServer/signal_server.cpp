@@ -24,9 +24,9 @@ void SignalServer::initConnection(qintptr descriptor)
 
 bool SignalServer::startListening(quint16 port)
 {
-    mServer = new ThreadedTcpServer(this);
+    m_server = new ThreadedTcpServer(this);
 
-    if (!mServer->listen(QHostAddress::Any, port)) {
+    if (!m_server->listen(QHostAddress::Any, port)) {
         qCritical("Failed to start server");
         return false;
     }
@@ -46,8 +46,13 @@ bool SignalServer::startListening(quint16 port)
        ipAddress = QHostAddress(QHostAddress::LocalHost).toString();
     }
 
-    qInfo("Server listening on %s:%d", qUtf8Printable(ipAddress), mServer->serverPort());
+    qInfo("Server listening on %s:%d", qUtf8Printable(ipAddress), m_server->serverPort());
 
-    connect(mServer, &ThreadedTcpServer::descriptorReady, this, &SignalServer::initConnection);
+    connect(m_server, &ThreadedTcpServer::descriptorReady, this, &SignalServer::initConnection);
     return true;
+}
+
+void SignalServer::exitServer() {
+    qInfo("Server stopped");
+    m_server->close();
 }

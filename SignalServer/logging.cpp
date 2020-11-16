@@ -4,7 +4,7 @@ void Logger::setLoggingFilters()
 {
     QString filterStr = "";
 
-    switch (mLevel) {
+    switch (m_level) {
     case QtMsgType::QtFatalMsg:
     case QtMsgType::QtCriticalMsg: filterStr += "*.critical=false\n";
     case QtMsgType::QtWarningMsg: filterStr += "*.warning=false\n";
@@ -18,31 +18,31 @@ void Logger::setLoggingFilters()
 
 bool Logger::setLoggingFile(QString filename)
 {
-    if (mOutputOptions.testFlag(Logger::File)) {
-        mLoggingFile.reset(new QFile(filename));
-        return mLoggingFile.data()->open(QIODevice::WriteOnly | QIODevice::Append);
+    if (m_outputOptions.testFlag(Logger::File)) {
+        m_loggingFile.reset(new QFile(filename));
+        return m_loggingFile.data()->open(QIODevice::WriteOnly | QIODevice::Append);
     }
     return true;
 }
 
 void Logger::setOutputOptions(OutputOptions options)
 {
-    mOutputOptions = options;
+    m_outputOptions = options;
 }
 
 void Logger::setLevel(QtMsgType level)
 {
-    mLevel = level;
+    m_level = level;
 }
 
 void Logger::handleMessage(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
-    if (mOutputOptions.testFlag(Logger::File)) {
-        QTextStream out(mLoggingFile.data());
+    if (m_outputOptions.testFlag(Logger::File)) {
+        QTextStream out(m_loggingFile.data());
         printMessage(type, context, msg, out);
     }
 
-    if (mOutputOptions.testFlag(Logger::StandardOutput)) {
+    if (m_outputOptions.testFlag(Logger::StandardOutput)) {
         QTextStream out(stdout);
         printMessage(type, context, msg, out);
     }

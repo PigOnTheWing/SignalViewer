@@ -6,11 +6,11 @@
 #include "logging.h"
 
 
-class QSettingsWrapper
+class SettingsWrapper
 {
 public:
-    QSettingsWrapper(QString filename);
-    ~QSettingsWrapper();
+    SettingsWrapper(QString filename);
+    ~SettingsWrapper();
 
     int getPort();
     QString getLoggingFile();
@@ -18,7 +18,7 @@ public:
     Logger::OutputOptions getOutputOptions();
 
 private:
-    QSettings mSettings;
+    QSettings m_settings;
 };
 
 #endif // QSETTINGSWRAPPER_H

@@ -28,9 +28,9 @@ public:
     void handleMessage(QtMsgType type, const QMessageLogContext &context, const QString &msg);
 
 private:
-    QScopedPointer<QFile> mLoggingFile;
-    OutputOptions mOutputOptions;
-    QtMsgType mLevel;
+    QScopedPointer<QFile> m_loggingFile;
+    OutputOptions m_outputOptions;
+    QtMsgType m_level;
 
     void printMessage(QtMsgType type, const QMessageLogContext &context, const QString &msg, QTextStream &out);
 };
