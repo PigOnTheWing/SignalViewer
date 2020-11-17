@@ -6,7 +6,7 @@
 
 const Logger::OutputOptions defaultOutOptions = Logger::File | Logger::StandardOutput;
 const QtMsgType defaultMsgType = QtMsgType::QtDebugMsg;
-const QString defaultLogFilename = "./log";
+const QString defaultLogFilename = "log.txt";
 const quint16 defaultPort = 0;
 
 #endif // DEFAULTS_H

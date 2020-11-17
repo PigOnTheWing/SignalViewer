@@ -11,7 +11,7 @@
 Logger g_logger;
 quint16 port;
 
-void appInit();
+void appInit(QStringList &);
 void close();
 
 #ifdef Q_OS_WIN
@@ -39,9 +39,11 @@ VOID WINAPI ServiceMain(int argc, char *argv[])
     reportStatus(SERVICE_START_PENDING, NO_ERROR, 3000);
 
     QCoreApplication a(argc, argv);
-    appInit();
+    //appInit();
 
-    g_logger.setOutputOptions(Logger::OutputOptions());
+    g_logger.setOutputOptions(Logger::File);
+
+    qInfo("Args count: %d, last arg - %s", argc, argv[argc - 1]);
 
     reportStatus(SERVICE_RUNNING, NO_ERROR, 0);
 
@@ -58,7 +60,9 @@ VOID WINAPI ServiceMain(int argc, char *argv[])
 VOID WINAPI ctrlHandler(DWORD dwCtrl)
 {
     switch (dwCtrl) {
-    case SERVICE_CONTROL_STOP:   
+    case SERVICE_CONTROL_STOP:
+        reportStatus(SERVICE_STOP_PENDING, NO_ERROR, 0);
+        QCoreApplication::quit();
         return;
     default:
         break;
@@ -95,6 +99,11 @@ void messageHandler(QtMsgType type, const QMessageLogContext &context, const QSt
 
 int main(int argc, char *argv[])
 {
+    QStringList args;
+    for (int i = 0; i < argc; ++i) {
+        args << argv[i];
+    }
+    appInit(args);
 
 #ifdef Q_OS_WIN
     SERVICE_TABLE_ENTRY DispatchTable[] = {
@@ -108,9 +117,8 @@ int main(int argc, char *argv[])
         }
     }
 #endif
-    QCoreApplication a(argc, argv);
-    appInit();
 
+    QCoreApplication a(argc, argv);
     g_logger.setLoggingFilters();
 
     SignalServer signalServer;
@@ -123,14 +131,14 @@ int main(int argc, char *argv[])
     close();
 }
 
-void parseArgs(QCommandLineParser &parser, QString *configFile) {
+void parseArgs(QCommandLineParser &parser, QStringList &args, QString *configFile) {
     parser.setApplicationDescription("A server that generates continuous signal with a given period and amplitude");
     parser.addHelpOption();
 
     QCommandLineOption configOption(QStringList() << "c" << "config" << "path", "A path to the configuration file", "path to config file");
     parser.addOption(configOption);
 
-    parser.process(QCoreApplication::arguments());
+    parser.process(args);
 
     *configFile = parser.value(configOption);
 }
@@ -157,12 +165,10 @@ void close() {
     exit(EXIT_SUCCESS);
 }
 
-void appInit() {
-    QCoreApplication::setApplicationName("SignalServer");
-
+void appInit(QStringList &args) {
     QString configFile;
     QCommandLineParser parser;
-    parseArgs(parser, &configFile);
+    parseArgs(parser, args, &configFile);
 
     if (configFile == "") {
         qCritical("No config option given, exiting");
