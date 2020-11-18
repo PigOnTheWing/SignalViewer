@@ -130,16 +130,30 @@ int main(int argc, char *argv[])
     close();
 }
 
-void parseArgs(QCommandLineParser &parser, QStringList &args, QString *configFile) {
+bool parseArgs(QCommandLineParser &parser, QStringList &args, QString *configFile) {
     parser.setApplicationDescription("A server that generates continuous signal with a given period and amplitude");
-    parser.addHelpOption();
+    //parser.addHelpOption();
 
     QCommandLineOption configOption(QStringList() << "c" << "config" << "path", "A path to the configuration file", "path to config file");
     parser.addOption(configOption);
 
-    parser.process(args);
+    QCommandLineOption helpOption(QStringList() << "h" << "help", "Show help");
+    parser.addOption(helpOption);
+
+    if (!parser.parse(args)) {
+        qInfo("Server usage:\n-h, --help - Show help;\n"
+              "-c <config>, --config=<config> - Use config file, <config> - path to ini file with configuration");
+        return false;
+    }
+
+    if (parser.isSet(helpOption)) {
+        qInfo("Server usage:\n-h, --help - Show help;\n"
+              "-c <config>, --config=<config> - Use config file, <config> - path to ini file with configuration");
+        return false;
+    }
 
     *configFile = parser.value(configOption);
+    return true;
 }
 
 bool parseConfig(QString &configFile) {
@@ -167,7 +181,9 @@ void close() {
 void appInit(QStringList &args) {
     QString configFile;
     QCommandLineParser parser;
-    parseArgs(parser, args, &configFile);
+    if (!parseArgs(parser, args, &configFile)) {
+        close();
+    }
 
     if (configFile == "") {
         qCritical("No config option given, exiting");
