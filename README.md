@@ -121,3 +121,29 @@ ini-файл должен содержать следующие пункты:
 4. Найти созданную службу (<имя_службы>).
 
 5. Запустить службу.
+
+### Linux (systemd)
+Для создания службы в Linux необходимо:
+
+1. Создать .service файл в директории /etc/systemd/system
+2. Заполнить файл в соответствии с форматом systemd. Пример:         
+   
+   	```
+   	[Unit]
+	Description=A server for signal generation
+	After=network.target
+	
+	[Service]
+	Environment=LD_LIBRARY_PATH=/путь/к/динамической/библиотеке/JsonParser
+	Type=simple
+	Restart=always
+	RestartSec=5
+	ExecStart=/путь/к/исполняемому/файлу --config=/путь/к/файлу/конфигурации
+	
+	[Install]
+	WantedBy=multi-user.target
+	```  
+3. Обновить список служб  
+	``` $ sudo systemctl daemon-reload ```
+4. Запустить службу  
+```$ sudo systemctl enable <имя_файла>.service```
