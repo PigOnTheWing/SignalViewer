@@ -39,7 +39,6 @@ VOID WINAPI ServiceMain(int argc, char *argv[])
     reportStatus(SERVICE_START_PENDING, NO_ERROR, 3000);
 
     QCoreApplication a(argc, argv);
-    //appInit();
 
     g_logger.setOutputOptions(Logger::File);
 
